@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIBES - Tableau de Présence</title>
+<style>
+  :root{
+    --navy:#1e2a78;
+    --navy-dark:#161f5c;
+    --bg:#f4f5fa;
+    --card:#ffffff;
+    --border:#e7e8f2;
+    --text:#1c1c28;
+    --muted:#8a8aa3;
+    --green:#1fae4b;
+    --green-bg:#e9f9ee;
+    --red:#e6483c;
+    --red-bg:#fdeceb;
+    --amber:#f0a92e;
+    --amber-bg:#fff6e6;
+    --pill-bg:#eef0fb;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Roboto, -apple-system, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding-bottom:100px;
+  }
+  .header{
+    background:linear-gradient(180deg,var(--navy),var(--navy-dark));
+    color:#fff;
+    text-align:center;
+    padding:28px 20px 24px;
+    border-radius:0 0 22px 22px;
+  }
+  .header h1{
+    margin:0;
+    font-size:2.1rem;
+    letter-spacing:2px;
+    font-weight:800;
+  }
+  .header p{
+    margin:6px 0 0;
+    font-size:0.95rem;
+    letter-spacing:2px;
+    opacity:0.85;
+    font-weight:500;
+  }
+  .meeting-card{
+    background:var(--card);
+    margin:16px;
+    padding:18px;
+    border-radius:var(--radius);
+    box-shadow:0 1px 4px rgba(20,20,50,0.05);
+  }
+  .field-label{
+    font-size:0.72rem;
+    font-weight:700;
+    color:#5a5a75;
+    letter-spacing:1px;
+    margin-bottom:6px;
+  }
+  .field{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-size:1rem;
+    background:#fafafe;
+    color:var(--text);
+    margin-bottom:16px;
+  }
+  .field:last-child{margin-bottom:0;}
+  .dept-title{
+    background:var(--pill-bg);
+    color:var(--navy);
+    font-weight:800;
+    letter-spacing:1px;
+    font-size:0.9rem;
+    padding:14px 18px;
+    margin:20px 16px 10px;
+    border-radius:10px;
+  }
+  .person-card{
+    background:var(--card);
+    margin:10px 16px;
+    padding:16px;
+    border-radius:var(--radius);
+    box-shadow:0 1px 4px rgba(20,20,50,0.05);
+  }
+  .person-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .person-name{
+    font-size:1.15rem;
+    font-weight:800;
+    margin:0 0 4px;
+  }
+  .person-contact{
+    font-size:0.85rem;
+    color:var(--muted);
+    line-height:1.5;
+    word-break:break-word;
+  }
+  .role-pill{
+    background:var(--pill-bg);
+    color:#4b4b6b;
+    font-size:0.8rem;
+    font-weight:600;
+    padding:8px 14px;
+    border-radius:14px;
+    white-space:nowrap;
+    text-align:center;
+  }
+  .status-row{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+    margin-top:14px;
+  }
+  .status-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:11px 4px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#fafafe;
+    font-weight:700;
+    font-size:0.85rem;
+    cursor:pointer;
+    color:#555;
+    transition:all .15s ease;
+    user-select:none;
+  }
+  .status-btn:hover{ filter:brightness(0.97); }
+  .status-btn.present.active{ background:var(--green); border-color:var(--green); color:#fff; }
+  .status-btn.absent.active{ background:var(--red); border-color:var(--red); color:#fff; }
+  .status-btn.reclamation.active{ background:var(--amber); border-color:var(--amber); color:#fff; }
+ 
+  .footer-bar{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    background:var(--bg);
+    padding:12px 16px 18px;
+    display:flex;
+    gap:10px;
+    box-shadow:0 -2px 10px rgba(20,20,50,0.06);
+  }
+  .btn{
+    flex:1;
+    padding:15px 10px;
+    border-radius:12px;
+    border:none;
+    font-weight:700;
+    font-size:0.95rem;
+    cursor:pointer;
+  }
+  .btn-reset{
+    background:#e3e4ef;
+    color:#4b4b6b;
+  }
+  .btn-export{
+    background:var(--navy);
+    color:#fff;
+  }
+  .summary{
+    display:flex;
+    justify-content:space-around;
+    margin:14px 16px 0;
+    font-size:0.8rem;
+    color:#4b4b6b;
+    font-weight:600;
+  }
+  .summary span b{
+    display:block;
+    font-size:1.3rem;
+    font-weight:800;
+  }
+  .summary .s-present b{color:var(--green);}
+  .summary .s-absent b{color:var(--red);}
+  .summary .s-reclamation b{color:var(--amber);}
+</style>
+</head>
+<body>
+ 
+<div class="header">
+  <h1>VIBES</h1>
+  <p>TABLEAU DE PRÉSENCE</p>
+</div>
+ 
+<div class="meeting-card">
+  <div class="field-label">DATE DE RÉUNION</div>
+  <input type="date" class="field" id="meetingDate">
+  <div class="field-label">ORDRE DU JOUR / SUJET</div>
+  <input type="text" class="field" id="meetingTopic" placeholder="Entrez le sujet de la réunion...">
+</div>
+ 
+<div class="summary" id="summary">
+  <span class="s-present">Présents<b id="cntPresent">0</b></span>
+  <span class="s-absent">Absents<b id="cntAbsent">0</b></span>
+  <span class="s-reclamation">Réclamations<b id="cntReclamation">0</b></span>
+</div>
+ 
+<div id="app"></div>
+ 
+<div class="footer-bar">
+  <button class="btn btn-reset" onclick="resetAll()">↺ Réinitialiser</button>
+  <button class="btn btn-export" onclick="exportCSV()">⬇ Exporter Rapport (CSV)</button>
+</div>
+ 
+<script>
+const data = [
+  { dept:"Bureau Exécutif / Direction", people:[
+    { name:"Med Ali Bellouma", role:"Président", phone:"52 317 655", email:"Belloumadali1@gmail.com" },
+    { name:"Ibtihel Maamouri", role:"Chef de projet", phone:"25 480 369", email:"ibtihelma078@gmail.com" },
+  ]},
+  { dept:"Département Marketing", people:[
+    { name:"Insaf Bejaoui", role:"VP Marketing", phone:"99 539 491", email:"Insafbejaoui644@gmail.com" },
+    { name:"Rayen Abidi", role:"Assistant Marketing", phone:"29 236 306", email:"Rayenabidi27551809@gmail.com" },
+  ]},
+  { dept:"Département Sponsoring", people:[
+    { name:"Balkys Rezgui", role:"VP Sponsoring", phone:"50 447 379", email:"balkisrezgui44@gmail.com" },
+    { name:"Feten Ben Selma", role:"Assistant Sponsoring", phone:"50 177 170", email:"Fetenbenselma@gmail.com" },
+    { name:"Hamza Ferjeni", role:"Assistant Sponsoring", phone:"21 627 586", email:"Ferjenih41@gmail.com" },
+  ]},
+  { dept:"Département Ressources Humaines (RH)", people:[
+    { name:"Nassereddine Hannechi", role:"VP RH", phone:"96 884 247", email:"hnashynsraldyn@gmail.com" },
+    { name:"Melek Dhahbi", role:"Assistant RH", phone:"29 586 214", email:"Meleks.houwa1998@gmail.com" },
+    { name:"Mouhammed Akili", role:"Assistant RH", phone:"21 330 864", email:"scalleta007@gmail.com" },
+  ]},
+  { dept:"Département Événementiel (Event)", people:[
+    { name:"Youssef Moez Elhechmi", role:"VP Événement", phone:"26 791 389", email:"elhechmiyoussefmoez@gmail.com" },
+    { name:"Med Aziz Hamdouni", role:"Assistant Événement", phone:"55 892 994", email:"hamdouniaziz99@gmail.com" },
+    { name:"Fedi Jridi", role:"Assistant Événement", phone:"51 013 413", email:"fedijridi5@gmail.com" },
+  ]},
+];
+ 
+// in-memory state: key = person name, value = 'present' | 'absent' | 'reclamation' | null
+const state = {};
+ 
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  data.forEach(section=>{
+    const deptEl = document.createElement('div');
+    deptEl.className = 'dept-title';
+    deptEl.textContent = section.dept.toUpperCase();
+    app.appendChild(deptEl);
+ 
+    section.people.forEach(person=>{
+      const card = document.createElement('div');
+      card.className = 'person-card';
+      card.innerHTML = `
+        <div class="person-top">
+          <div>
+            <div class="person-name">${person.name}</div>
+            <div class="person-contact">📱 ${person.phone} | ✉ ${person.email}</div>
+          </div>
+          <div class="role-pill">${person.role}</div>
+        </div>
+        <div class="status-row">
+          <div class="status-btn present" data-name="${person.name}" data-status="present">✅ Présent</div>
+          <div class="status-btn absent" data-name="${person.name}" data-status="absent">❌ Absent</div>
+          <div class="status-btn reclamation" data-name="${person.name}" data-status="reclamation">⚠️ Réclamation</div>
+        </div>
+      `;
+      app.appendChild(card);
+    });
+  });
+ 
+  document.querySelectorAll('.status-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const name = btn.dataset.name;
+      const status = btn.dataset.status;
+      state[name] = (state[name] === status) ? null : status;
+      updateActiveStates();
+      updateSummary();
+    });
+  });
+ 
+  updateActiveStates();
+  updateSummary();
+}
+ 
+function updateActiveStates(){
+  document.querySelectorAll('.status-btn').forEach(btn=>{
+    const name = btn.dataset.name;
+    const status = btn.dataset.status;
+    btn.classList.toggle('active', state[name] === status);
+  });
+}
+ 
+function updateSummary(){
+  let present=0, absent=0, reclamation=0;
+  Object.values(state).forEach(v=>{
+    if(v==='present') present++;
+    else if(v==='absent') absent++;
+    else if(v==='reclamation') reclamation++;
+  });
+  document.getElementById('cntPresent').textContent = present;
+  document.getElementById('cntAbsent').textContent = absent;
+  document.getElementById('cntReclamation').textContent = reclamation;
+}
+ 
+function resetAll(){
+  Object.keys(state).forEach(k=> delete state[k]);
+  document.getElementById('meetingTopic').value = '';
+  updateActiveStates();
+  updateSummary();
+}
+ 
+function exportCSV(){
+  const date = document.getElementById('meetingDate').value || '';
+  const topic = document.getElementById('meetingTopic').value || '';
+  let rows = [['Date de réunion', date],['Sujet', topic],[],
+    ['Département','Nom','Rôle','Téléphone','Email','Statut']];
+ 
+  data.forEach(section=>{
+    section.people.forEach(person=>{
+      const status = state[person.name] || 'Non défini';
+      const statusLabel = status==='present' ? 'Présent' : status==='absent' ? 'Absent' : status==='reclamation' ? 'Réclamation' : 'Non défini';
+      rows.push([section.dept, person.name, person.role, person.phone, person.email, statusLabel]);
+    });
+  });
+ 
+  const csv = rows.map(r => r.map(field => `"${String(field).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `presence_${date || 'export'}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+ 
+// default date = today
+document.getElementById('meetingDate').valueAsDate = new Date();
+ 
+render();
+</script>
+ 
+</body>
+</html>
